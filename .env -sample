@@ -1,0 +1,5 @@
+PORT=5000
+PUBLIC_VAPID_KEY=
+PRIVATE_VAPID_KEY=
+MAIL_TO=mailto:example@example.com
+URL_FDJ=https://www.fdj.fr/jeux-de-tirage/euromillions-my-million#/
