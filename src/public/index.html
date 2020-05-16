@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Euromillions Notifier</title>
+    <link rel="icon" type="image/png" href="images/big-star.svg" />
+    <!-- href="https://www.fdj.fr/img/banner/logo/big-star.svg" -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <!-- <h1>Euromillions Notifier</h1> -->
+      <div id="prize" class="header"></div>
+    </header>
+
+    <!-- TODO Open app or URL -->
+    <!-- <a href="fdj://launch">link</a> -->
+
+    <div class="description">
+      Abonnement pour recevoir des notifications chaque jour lorsque la cagnotte
+      dépasse 100 millions €<br />
+      (Vous devez accepter les notifications pour ce site)
+    </div>
+
+    <div class="buttons">
+      <button class="subscribe">S'abonner</button>
+      <button class="unsubscribe">Se désabonner</button>
+      <div class="notSupported" style="display: none;">
+        Ce navigateur ne supporte pas les notifications.
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

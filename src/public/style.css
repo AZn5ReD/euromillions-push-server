@@ -17,16 +17,26 @@ body {
 
 header {
   width: 100%;
-  height: 300px;
+  padding: 5vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #33154f;
-  color: #11d771;
-  margin-bottom: 30px;
+  background-color: #243f85;
+  color: #eebb01;
+}
+
+.header {
+  text-align: center;
+  padding: 5vh;
 }
 
 .buttons {
+  text-align: center;
+}
+
+.description {
+  padding: 5vh;
   text-align: center;
 }
 
@@ -35,6 +45,7 @@ button {
   height: 38px;
   padding: 0 30px;
   color: #fff;
+  text-align: center;
   text-align: center;
   font-size: 11px;
   font-weight: 600;
@@ -51,10 +62,18 @@ button {
 }
 
 button:hover {
-  outline: 0;
+  background-color: #2d5bd1;
 }
 
-.trigger-push {
-  background-color: #073525;
-  border: 1px solid #073525;
+.subscribe,
+.unsubscribe {
+  background-color: #243f85;
+}
+
+button:disabled {
+  background-color: grey;
+}
+
+.notSupported {
+  padding: 2vh;
 }

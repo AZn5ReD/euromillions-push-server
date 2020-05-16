@@ -20,17 +20,6 @@ const subscription = {
   },
 };
 
-// const subscription = {
-//   endpoint:
-//     "https://fcm.googleapis.com/fcm/send/cpFJZX21JZo:APA91bHLyRMrsunXgJM9gy9jVLaWTvC2K0jmH9VEHWFNvXe8O2vis8nCGy8EzaTirTR700oJ8CBQRH2qhFS6Cx1tUXk0pCzC30yDc-2AN7OAuLKvZzJXt9vRidh4THIveukv6uTWGCnR",
-//   expirationTime: null,
-//   keys: {
-//     p256dh:
-//       "BMDmRlpzKJt7fygtQ10aaLLhgwFlxgA2waGpIPxoDsaCIeJTXKesnasJvLaW--9euNTuUEzyu68Nd6m7PZJeRMg",
-//     auth: "8T1CZJmZcHvmoJP4no1CRw",
-//   },
-// };
-
 webPush
   .sendNotification(
     subscription,
