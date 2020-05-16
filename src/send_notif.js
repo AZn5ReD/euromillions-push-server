@@ -3,7 +3,7 @@ require("dotenv").config();
 const db = require("./db").initDb();
 const webPush = require("./webpush").initWebPush();
 
-console.info("Début du script d'envoi à ", new Date().toString());
+console.info("Début du script d'envoi le:", new Date().toString());
 
 (async () => {
   let prize;
