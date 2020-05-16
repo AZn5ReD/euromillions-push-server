@@ -107,4 +107,4 @@ dist
 keys
 
 # DB
-db.json
+data/

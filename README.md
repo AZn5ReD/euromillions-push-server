@@ -31,6 +31,7 @@ npm install
 ## Test
 
 The dev mode use the same `.env` file as production.
+Create the `data` folder at the root of the project. This will hold the database `db.json`
 
 ```bash
 npm run dev
@@ -39,9 +40,18 @@ npm run dev
 ## Run
 
 Use the `.env` file.
+Create the `data` folder at the root of the project. This will hold the database `db.json`
 
 ```bash
 npm run start
+```
+
+## Docker
+
+You can rewrite the environment inside the docker files when deploying to production.
+
+```bash
+docker-compose up -d
 ```
 
 ## Build With

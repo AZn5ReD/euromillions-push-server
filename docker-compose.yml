@@ -1,0 +1,10 @@
+version: "3"
+services:
+  server:
+    container_name: euromillions-push-server
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ~/volumes/euromillions-push-server:/usr/src/app/data
+    restart: always
