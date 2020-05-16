@@ -105,3 +105,6 @@ dist
 
 # Private VAPID keys
 keys
+
+# DB
+db.json

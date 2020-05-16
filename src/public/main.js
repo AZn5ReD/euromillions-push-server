@@ -107,7 +107,12 @@ const app = (() => {
   }
   unsubscribeButton.addEventListener("click", async () => {
     try {
+      swRegistration = await navigator.serviceWorker.getRegistration("sw.js");
+      if (!swRegistration) {
+        throw new Error("Pas de service worker retrouvé.");
+      }
       await unsubscribe();
+      alert("Désabonnement réussi.");
     } catch (error) {
       displayError(error);
     }

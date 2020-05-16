@@ -1,22 +1,16 @@
 self.addEventListener("push", (event) => {
   const { title, options } = event.data.json();
-  console.log(title);
-  console.log(options);
-
   self.registration.showNotification(title, options);
 });
 
-// self.addEventListener("notificationclose", (event) => {
-//   const notification = event.notification;
-//   const primaryKey = notification.data.primaryKey;
-
-//   console.log("Closed notification: " + primaryKey);
-// });
-
 self.addEventListener("notificationclick", (event) => {
   const notification = event.notification;
-  const primaryKey = notification.data.primaryKey;
   const action = event.action;
+  const actions = {
+    home: "/",
+    app: "fdj://launch",
+    web: "https://www.fdj.fr/jeux-de-tirage/euromillions-my-million",
+  };
 
   if (action === "close") {
     notification.close();
@@ -27,11 +21,10 @@ self.addEventListener("notificationclick", (event) => {
           return c.visibilityState === "visible";
         });
         if (client !== undefined) {
-          client.navigate("samples/page" + primaryKey + ".html");
+          client.navigate(actions[action]);
           client.focus();
         } else {
-          // there are no visible windows. Open one.
-          clients.openWindow("samples/page" + primaryKey + ".html");
+          clients.openWindow(actions[action]);
           notification.close();
         }
       })

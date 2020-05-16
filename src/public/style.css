@@ -35,7 +35,8 @@ header {
   text-align: center;
 }
 
-.description {
+.description,
+.github {
   padding: 5vh;
   text-align: center;
 }

@@ -9,9 +9,19 @@ const webPush = require("web-push");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fetch = require("node-fetch");
-const lowDb = require("lowdb");
 const cheerio = require("cheerio");
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
 
+// DB
+const adapter = new FileSync("db.json");
+const db = low(adapter);
+db.defaults({ auths: [] });
+if (!db.has("auths").value()) {
+  db.set("auths", []).write();
+}
+
+// Express
 const app = express();
 
 app.use(bodyParser.json());
@@ -34,9 +44,16 @@ app.get("/fdj", async (req, res) => {
 
 app.post("/subscribe", (req, res) => {
   const subscription = req.body;
+  const id = subscription.keys.auth;
 
-  console.log(subscription);
-  // TODO Save subscription to DB
+  const auth = db.get("auths").find({ id });
+  if (!auth.value()) {
+    try {
+      db.get("auths").push({ id, value: subscription }).write();
+    } catch (error) {
+      next(error);
+    }
+  }
 
   const payload = {
     title: "Super ! Vous êtes abonné ! 🎉",
@@ -62,13 +79,27 @@ app.post("/subscribe", (req, res) => {
 
   webPush
     .sendNotification(subscription, JSON.stringify(payload))
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      next(error);
+    });
 
   res.status(201).json({});
 });
 
-app.post("unsubscribe", (req, res) => {
-  // TODO Remove from DB
+app.post("/unsubscribe", (req, res) => {
+  const subscription = req.body;
+  const id = subscription.keys.auth;
+
+  const auth = db.get("auths").find({ id });
+  if (auth.value()) {
+    try {
+      db.get("auths").remove({ id }).write();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  res.status(200).json({});
 });
 
 app.set("port", process.env.PORT || 5000);
