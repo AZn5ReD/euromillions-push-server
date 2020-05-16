@@ -11,6 +11,8 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
+const schedule = require("node-schedule");
+const child_process = require("child_process");
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
 
@@ -21,6 +23,26 @@ db.defaults({ auths: [] });
 if (!db.has("auths").value()) {
   db.set("auths", []).write();
 }
+
+// send_notif
+schedule.scheduleJob("17 18 * * *", function () {
+  const child = child_process.fork("src/send_notif.js", {
+    stdio: ["pipe", "pipe", "pipe", "ipc"],
+  });
+
+  if (child.stdout && child.stderr) {
+    child.stdout.on("data", (data) => {
+      console.log(Buffer.from(data).toString());
+    });
+    child.stderr.on("data", (data) => {
+      console.log(Buffer.from(data).toString());
+    });
+  }
+  // child.on("message", (message: ProcessMessage) => {});
+  child.on("exit", () => {
+    console.info("Notifications terminées");
+  });
+});
 
 // Express
 const app = express();
