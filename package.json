@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon node src/server.js",
-    "send": "node send_notif.js"
+    "send": "node src/send_notif.js"
   },
   "author": "",
   "license": "ISC",

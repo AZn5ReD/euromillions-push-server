@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
+const mailTo = process.env.MAIL_TO;
 const urlFdj = process.env.URL_FDJ;
 
 const express = require("express");
@@ -27,11 +28,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-webPush.setVapidDetails(
-  "mailto:example@example.com",
-  publicVapidKey,
-  privateVapidKey
-);
+webPush.setVapidDetails(mailTo, publicVapidKey, privateVapidKey);
 
 app.get("/fdj", async (req, res) => {
   const fdjPage = await fetch(urlFdj); // TODO Cache response ?
@@ -39,6 +36,8 @@ app.get("/fdj", async (req, res) => {
   let $ = await cheerio.load(text);
   $("sup").remove();
   $("img").remove();
+  $(".banner-euromillions_text-name").append("<br/>");
+  $(".banner-euromillions_text-supwinner").remove();
   res.send($(".banner-mini_text-content").html());
 });
 
@@ -50,6 +49,7 @@ app.post("/subscribe", (req, res) => {
   if (!auth.value()) {
     try {
       db.get("auths").push({ id, value: subscription }).write();
+      console.info("Nouvel abonnement:", id);
     } catch (error) {
       next(error);
     }
@@ -83,6 +83,7 @@ app.post("/subscribe", (req, res) => {
       next(error);
     });
 
+  console.info("Message de bienvenu envoyé à:", id);
   res.status(201).json({});
 });
 
@@ -94,15 +95,20 @@ app.post("/unsubscribe", (req, res) => {
   if (auth.value()) {
     try {
       db.get("auths").remove({ id }).write();
+      console.info("Désabonnement:", id);
     } catch (error) {
       next(error);
     }
   }
-
   res.status(200).json({});
 });
 
 app.set("port", process.env.PORT || 5000);
 const server = app.listen(app.get("port"), () => {
-  console.log(`Server running on port ${server.address().port}`);
+  console.info(`Serveur démarré sur le port ${server.address().port}`);
+});
+
+process.on("uncaughtException", function (e) {
+  console.error(new Date().toString(), e.stack || e);
+  process.exit();
 });

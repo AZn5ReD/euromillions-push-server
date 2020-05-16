@@ -10,6 +10,7 @@ self.addEventListener("notificationclick", (event) => {
     home: "/",
     app: "fdj://launch",
     web: "https://www.fdj.fr/jeux-de-tirage/euromillions-my-million",
+    "": "https://www.fdj.fr/jeux-de-tirage/euromillions-my-million",
   };
 
   if (action === "close") {

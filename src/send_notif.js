@@ -1,28 +1,91 @@
 require("dotenv").config();
-const webPush = require("web-push");
 
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
+const mailTo = process.env.MAIL_TO;
+const urlFdj = process.env.URL_FDJ;
 
-webPush.setVapidDetails(
-  "mailto:chirk.jonathan@gmail.com",
-  publicVapidKey,
-  privateVapidKey
-);
+const webPush = require("web-push");
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
 
-const subscription = {
-  endpoint:
-    "https://updates.push.services.mozilla.com/wpush/v2/gAAAAABeucs93ODzPTLD8cg3NSj5s2Z6DRSAQajI7S_ZgX7fX4eWgXWy4UdsfzEn71BLc6J_Ih4X7vhslh4_GCCffwqL7y4f8Xq26DKxbzkhQE77bbEbJ-MFf7caxcy4x8QvWiPM4KUyB6ypPj1A1t-vDrFeXu_JpeViRPBB1SiPyGnEUBwWbpw",
-  keys: {
-    auth: "tqyJ8E7g-eAyBHD7qsDcbg",
-    p256dh:
-      "BKYPSgE9OF4NwxClhRNqtNFmyoZf7AjFJ6N2tSgZultRedEv54Ulq2uo_lMkcU5986hM0zFJri_gZEAzB9OXroU",
-  },
-};
+console.info("Début du script d'envoi à ", new Date().toString());
 
-webPush
-  .sendNotification(
-    subscription,
-    JSON.stringify({ title: "Hello", body: "It's me" })
-  )
-  .catch((error) => console.error(error));
+// DB
+const adapter = new FileSync("db.json");
+const db = low(adapter);
+db.defaults({ auths: [] });
+if (!db.has("auths").value()) {
+  db.set("auths", []).write();
+}
+
+webPush.setVapidDetails(mailTo, publicVapidKey, privateVapidKey);
+
+(async () => {
+  let prize;
+  try {
+    const fdjPage = await fetch(urlFdj);
+    const text = await fdjPage.text();
+    let $ = await cheerio.load(text);
+    prize = await $(".banner-euromillions_text-gain_num").html();
+  } catch (error) {
+    throw new Error(
+      "Erreur lors de la récupération du montant de la cagnotte."
+    );
+  }
+  console.info("Cagnotte à:", prize);
+
+  const auths = db.get("auths").value();
+  console.info("Nombre d'envoi à faire:", auths.length);
+
+  const payload = {
+    title: `Cagnotte à ${prize} millions € ! 🤑`,
+    options: {
+      body: "Pensez à jouer !",
+      tag: "em1",
+      icon: "images/icon.png",
+      badge: "images/badge.png",
+      vibrate: [100, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: 1,
+      },
+      actions: [
+        {
+          action: "app",
+          title: "App FDJ",
+        },
+        {
+          action: "web",
+          title: "Site FDJ.fr",
+        },
+      ],
+    },
+  };
+
+  let removeId = [];
+  for (auth in auths) {
+    console.info("Envoi à:", auths[auth].id);
+    await webPush
+      .sendNotification(auths[auth].value, JSON.stringify(payload))
+      .catch((error) => {
+        console.error("Erreur avec:", auths[auth].id, error);
+        removeId.unshift(auths[auth].id);
+      });
+  }
+
+  console.info("Nombre de suppression:", removeId.length);
+  for (i in removeId) {
+    db.get("auths").remove({ id: removeId[i] }).write();
+    console.info("Suppression de:", removeId[i]);
+  }
+})().then(() => {
+  process.exit();
+});
+
+process.on("uncaughtException", function (e) {
+  console.error(new Date().toString(), e.stack || e);
+  process.exit();
+});
