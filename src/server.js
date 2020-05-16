@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const vapidKey = process.env.PUBLIC_VAPID_KEY;
+
 const db = require("./db").initDb();
 const webPush = require("./webpush").initWebPush();
 const app = require("./express").initExpress();
@@ -9,6 +11,10 @@ require("./schedule").scheduleNotification();
 app.get("/fdj", async (req, res) => {
   let $ = await require("./cheerio").fdjPage();
   res.send(await $(".banner-mini_text-content").html());
+});
+
+app.get("/vapidkey", async (req, res) => {
+  res.send(vapidKey);
 });
 
 app.post("/subscribe", (req, res) => {

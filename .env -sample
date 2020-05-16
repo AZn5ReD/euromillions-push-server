@@ -3,4 +3,5 @@ PUBLIC_VAPID_KEY=
 PRIVATE_VAPID_KEY=
 MAIL_TO=mailto:example@example.com
 CRON_SCHEDULE=00 00 * * *
+PRIZE_THRESHOLD=100
 URL_FDJ=https://www.fdj.fr/jeux-de-tirage/euromillions-my-million#/

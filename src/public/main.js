@@ -22,13 +22,73 @@ function displayError(error) {
   alert(error.message);
 }
 
-const app = (() => {
+async function getVapidKey() {
+  try {
+    const response = await fetch("/vapidkey", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération de la clé VAPID.");
+    }
+    return await response.text();
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function subscribe(swRegistration, publicVapidKey) {
+  try {
+    const subscription = await swRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+    });
+    if (!subscription) {
+      throw new Error("Erreur lors de l'abonnement aux notifications.");
+    }
+    const response = await fetch("/subscribe", {
+      method: "POST",
+      body: JSON.stringify(subscription),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur dans la requête pour s'abonner.");
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function unsubscribe(swRegistration) {
+  try {
+    const subscription = await swRegistration.pushManager.getSubscription();
+    if (!subscription) {
+      throw new Error("Pas d'abonnement retrouvé.");
+    }
+    const response = await fetch("/unsubscribe", {
+      method: "POST",
+      body: JSON.stringify(subscription),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur dans la requête pour se désabonner.");
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+const app = (async () => {
   "use strict";
 
-  const publicVapidKey =
-    "BOAZba0OdFM5CcZqxH8S8ElgMKuw47nJ9gNbqfTT50ovVixoO9EW1wK4_R4paz-umeBW6c-tIHJcfKPDsXlJK6I";
-
   let swRegistration = null;
+  const publicVapidKey = await getVapidKey();
 
   const subscribeButton = document.querySelector(".subscribe");
   const unsubscribeButton = document.querySelector(".unsubscribe");
@@ -40,30 +100,6 @@ const app = (() => {
     });
     document.querySelector(".notSupported").style.display = "block";
     return;
-  }
-
-  async function subscribe() {
-    try {
-      const subscription = await swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
-      });
-      if (!subscription) {
-        throw new Error("Erreur lors de l'abonnement aux notifications.");
-      }
-      const response = await fetch("/subscribe", {
-        method: "POST",
-        body: JSON.stringify(subscription),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Erreur dans la requête pour s'abonner.");
-      }
-    } catch (error) {
-      throw new Error(error);
-    }
   }
 
   subscribeButton.addEventListener("click", async () => {
@@ -79,39 +115,19 @@ const app = (() => {
         throw new Error("Erreur lors du chargement du service worker.");
       }
       await navigator.serviceWorker.ready;
-      await subscribe();
+      await subscribe(swRegistration, publicVapidKey);
     } catch (error) {
       displayError(error);
     }
   });
 
-  async function unsubscribe() {
-    try {
-      const subscription = await swRegistration.pushManager.getSubscription();
-      if (!subscription) {
-        throw new Error("Pas d'abonnement retrouvé.");
-      }
-      const response = await fetch("/unsubscribe", {
-        method: "POST",
-        body: JSON.stringify(subscription),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Erreur dans la requête pour se désabonner.");
-      }
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
   unsubscribeButton.addEventListener("click", async () => {
     try {
       swRegistration = await navigator.serviceWorker.getRegistration("sw.js");
       if (!swRegistration) {
         throw new Error("Pas de service worker retrouvé.");
       }
-      await unsubscribe();
+      await unsubscribe(swRegistration);
       alert("Désabonnement réussi.");
     } catch (error) {
       displayError(error);
