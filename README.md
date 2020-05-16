@@ -46,6 +46,12 @@ Create the `data` folder at the root of the project. This will hold the database
 npm run start
 ```
 
+You can also trigger manually the sent with the following command :
+
+```bash
+npm run send
+```
+
 ## Docker
 
 You can rewrite the environment inside the docker files when deploying to production.
