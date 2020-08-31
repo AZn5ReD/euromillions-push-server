@@ -1,5 +1,5 @@
-self.addEventListener("push", (event) => {
-  const { title, options } = event.data.json();
+self.addEventListener("push", async (event) => {
+  const { title, options } = await event.data.json();
   self.registration.showNotification(title, options);
 });
 
