@@ -10,8 +10,7 @@ console.info("Début du script d'envoi le:", new Date().toString());
 (async () => {
   let prize;
   try {
-    const $ = await require("./cheerio").fdjPage();
-    prize = await $(".banner-euromillions_text-gain_num").html();
+    prize = await require("./cheerio").getPrize();
     console.info("Cagnotte à:", prize);
     console.info("Seuil de notification à:", threshold);
   } catch (error) {

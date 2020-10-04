@@ -35,6 +35,14 @@ header {
   font-size: 0.5em;
 }
 
+.date {
+  font-size: 1.25rem;
+}
+
+.value {
+  font-size: 2rem;
+}
+
 .buttons {
   text-align: center;
 }

@@ -9,8 +9,8 @@ const app = require("./express").initExpress();
 require("./schedule").scheduleNotification();
 
 app.get("/fdj", async (req, res) => {
-  let $ = await require("./cheerio").fdjPage();
-  res.send(await $(".banner-mini_text-content").html());
+  const pageContent = await require("./cheerio").getPageContent();
+  res.send(pageContent);
 });
 
 app.get("/vapidkey", async (req, res) => {
